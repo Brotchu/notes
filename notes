@@ -1,0 +1,48 @@
+#!/usr/bin/python3
+import sys
+import os
+
+arg_num = len(sys.argv) -1
+
+#print(sys.argv[1])
+
+def getfileslist():
+    ret_list = [x[:-5] for x in os.listdir() if x[-5:]==".note" ]
+    return ret_list
+
+def writenote(name,mode):
+    note_file = open(name+".note",mode)
+    line = "------------"
+    if(mode == "w"):
+        line = name.upper()
+        print("enter note : "+line)
+    while(line!="exit"):
+        note_file.write(line+'\n')
+        line = str(input())
+    note_file.close()
+
+def readnote(name):
+    note_file = open(name+".note", "r")
+    print(note_file.read())
+    note_file.close()
+
+if arg_num > 2 or arg_num < 1:
+    print("wrong usage, use -h option to see options")
+elif(sys.argv[1] == "-h"):
+    print("NOTES v1.0.0")
+    print("options : ")
+    print(" -n : new note, give note name")
+    print(" -a : append note, give note to append to ")
+    print(" -r : read a note, error if note not present")
+    print(" -s : show all notes saved, no extra arguments")
+elif(sys.argv[1] == "-s"):
+    print(getfileslist())
+elif(sys.argv[1] == "-n"):
+    writenote(sys.argv[2],"w")
+elif(sys.argv[1] == "-a"):
+    readnote(sys.argv[2])
+    writenote(sys.argv[2],"a")
+elif(sys.argv[1] == "-r"):
+    readnote(sys.argv[2])
+else:
+    print("wrong usage, use -h option to see options")
