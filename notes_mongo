@@ -8,26 +8,42 @@ arg_num = len(sys.argv) -1
 #print(sys.argv[1])
 
 my_client = pymongo.MongoClient("mongodb://localhost:27017/")
+my_db = my_client["notes_db"]
+my_col = my_db["notes"]
+
 
 def getfileslist():
-    oret_list = [x[:-5] for x in os.listdir() if x[-5:]==".note" ]
-    return ret_list
+    #ret_list = [x[:-5] for x in os.listdir() if x[-5:]==".note" ]
+    print(my_col.find())
+    for x in my_col.find():
+     print(x["note_head"] )
+    #return ret_list
 
 def writenote(name,mode):
-    note_file = open(name+".note",mode)
+    #note_file = open(name+".note",mode)
+    header = name
     line = "------------"
+    content = ""
     if(mode == "w"):
+        #line = name.upper()
         line = name.upper()
         print("enter note : "+line)
     while(line!="exit"):
-        note_file.write(line+'\n')
+        #note_file.write(line+'\n')
+        #line = str(input())
+        content = content + line + '\n'
         line = str(input())
-    note_file.close()
+    my_col.insert_one({"note_head":header, "note_content":content})
+    #note_file.close()
 
 def readnote(name):
-    note_file = open(name+".note", "r")
-    print(note_file.read())
-    note_file.close()
+    #note_file = open(name+".note", "r")
+    #print(note_file.read())
+    #note_file.close()
+    my_query = {"note_head":name}
+    for x in my_col.find(my_query):
+     print(x["note_head"])
+     print(x["note_content"])
 
 if arg_num > 2 or arg_num < 1:
     print("wrong usage, use -h option to see options")
@@ -39,13 +55,13 @@ elif(sys.argv[1] == "-h"):
     print(" -r : read a note, error if note not present")
     print(" -s : show all notes saved, no extra arguments")
 elif(sys.argv[1] == "-s"):
-    print(getfileslist())
-elif(sys.argv[1] == "-n" && arg_num == 2):
+    getfileslist()
+elif(sys.argv[1] == "-n" and arg_num == 2):
     writenote(sys.argv[2],"w")
-elif(sys.argv[1] == "-a" && arg_num == 2):
+elif(sys.argv[1] == "-a" and arg_num == 2):
     readnote(sys.argv[2])
     writenote(sys.argv[2],"a")
-elif(sys.argv[1] == "-r" && arg_num == 2):
+elif(sys.argv[1] == "-r" and arg_num == 2):
     readnote(sys.argv[2])
 else:
     print("wrong usage, use -h option to see options")
